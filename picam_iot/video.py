@@ -1,32 +1,40 @@
+from picamera import PiCamera
+from time import sleep
+from storage import storage
 
-class image:
+class video:
     """
     Manages all video operations. Allows recording and storage of videos, 
     setting up of camera video characteristics and interfacing videos with motion and face detection
     """
-    def __init__(self):
+    def __init__(self, local = "./"):
         """
         Initializes the video manegement module 
         
         """
-        pass
-    
-    def start(self):
-        """ Start recording a video
-        """
-        pass
+        self.camera = PiCamera()
+        self.storage = storage()
+        self.storage.set_local(local)
 
-    def stop(self, storage = "local"):
+    def start(self, name):
+        """ Start recording a video
+
+        :param name: name and extension of the video
+        """
+        self.camera.start_preview()
+        self.camera.start_recording(self.storage.get_local() + name)
+
+    def stop(self):
         """Stops video recording and saves video file into the specified storage.
 
-        :param storage: The target location of the video. Default is local
         :returns: A video file
         :rtype:  format specified
         
         """
-        pass
+        self.camera.stop_recording()
+        self.camera.stop_preview()
 
-    def record(self, duration = 15 , storage = "local"):
+    def record(self, name,duration = 15 , storage = "local"):
         """ Records a video with a specified duration and saves it to the specified storage.
         
         :param duration: Video duration in seconds. Default is 15 seconds.
@@ -34,7 +42,11 @@ class image:
         :returns: A video with the specified duration. 
         :rtype: format specified
         """
-        pass
+        if self.camera._check_camera_open():
+            self.stop()
+        self.start(name)
+        sleep(duration)
+        self.stop()
 
     def set_resolution(self, res = (1024, 768), width = 1024, height = 768 ):
         """ Sets the resolution of the videos
@@ -42,7 +54,7 @@ class image:
         :param width: Sets the camera width to the provided width. Default is 1024 pixels.
         :param height: Sets camera heigh to the specified height. Default is 768.
         """
-        pass
+        self.camera.resolution = res
 
     def local_stream(self,motion = False, motion_save = False, storage = "local"):
         """ Records and display locally a continous stream.

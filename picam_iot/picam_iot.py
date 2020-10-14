@@ -1,4 +1,4 @@
-import PiCamera
+from picamera import PiCamera
 import time
 
 class picam_iot:
