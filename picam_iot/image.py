@@ -51,5 +51,3 @@ class image:
     
 if __name__ == "__main__":
     pass
-
-    
