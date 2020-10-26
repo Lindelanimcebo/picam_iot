@@ -62,22 +62,6 @@ class video:
         """
         self.camera.resolution = res
 
-    def local_stream(self,motion = False, motion_save = False, storage = "local"):
-        """ Records and display locally a continous stream.
-        :param motion: Enables/disables motion detection.
-        :param motion_save: Allows/Disallow streams where motion was detected to be saved to the specified storage.
-        :param storage: Target storage to save streams. Default is local.
-
-        """
-        pass
-    def network_stream(self, motion = False, motion_save = False):
-        """ Records and display locally a continous stream to a network.
-        :param motion: Enables/disables motion detection.
-        :param motion_save: Allows/Disallow streams where motion was detected to be saved to the specified storage.
-
-        """
-        pass
-
     def motion_detect(self, images = False, videos = False):
         """ Detects motion in a video stream.
         :returns: a flag to indicate the presence of motion within a video stream.
@@ -154,34 +138,26 @@ class video:
             
             raw.truncate(0)
     
-    def frames_to_video(self,frames = [], name = "video", video_type = ".avi"):
+    def frames_to_video(self,frames = [], name = "video", video_type = "avi"):
+        """Convert a series of frames/images to a single video.
+
+        :param frames: a list containing the frames to be converted.
+        :param name: The name of the video to be saved.
+        :param video_type: the video file extension.
+        
+        """
 
         if len(frames) < 1:
             return False
+
         print("making video")
         h, w, l = frames[0].shape
         fourcc = cv2.VideoWriter_fourcc(*'DIVX')
-        video = cv2.VideoWriter(self.local + name + video_type, fourcc, 16, (h,w))
+        video = cv2.VideoWriter(self.local + name + "." + video_type, fourcc, 16, (h,w))
 
         for i in range(len(frames)):
             video.write(frames[i])
 
         video.release()
-        print("video saved")
 
         return True
-
-
-    def face_detect():
-        """ Detects faces within a video stream
-        :returns: a flag to indicate presence of a face
-        :rtype: Boolean
-        
-        """
-        pass
-
-    def draw_box(self, frame, color = 'blue'):
-        """ Draws a box around the specified frame
-        :param frame: A tuple with frame to draw the box around
-        """
-        pass
