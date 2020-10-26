@@ -1,9 +1,10 @@
-import PiCamera
+from picamera import PiCamera
 import time
+from video import *
+from image import *
 
 class picam_iot:
     """Main module."""
 
     def __init__(self):
-        """ Initialises the camera object, opencv and provide these to all subclasses where necessary
-        """
+        pass
