@@ -6,7 +6,7 @@ import dropbox as dbx
 import posixpath
 from dropbox.exceptions import ApiError
 
-class local:
+class local_storage:
     """ A class to manage local storage functionality.
     """
     def __init__(self, images_dir = './images/', videos_dir = './videos/'):
