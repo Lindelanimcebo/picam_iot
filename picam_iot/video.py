@@ -5,22 +5,20 @@ import imutils
 import cv2
 import numpy as np
 from time import sleep
-from storage import storage
+from storage import *
 
 class video:
     """
     Manages all video operations. Allows recording and storage of videos, 
     setting up of camera video characteristics and interfacing videos with motion and face detection
     """
-    def __init__(self, local = "./"):
+    def __init__(self, local = "./videos/"):
         """
         Initializes the video manegement module 
         
         """
         self.local = local
         self.camera = PiCamera()
-        self.storage = storage()
-        self.storage.set_local(local)
 
     def start(self, name):
         """ Start recording a video
@@ -28,7 +26,7 @@ class video:
         :param name: name and extension of the video
         """
         self.camera.start_preview()
-        self.camera.start_recording(self.storage.get_local() + name)
+        self.camera.start_recording(self.local + name)
 
     def stop(self):
         """Stops video recording and saves video file into the specified storage.
@@ -40,11 +38,10 @@ class video:
         self.camera.stop_recording()
         self.camera.stop_preview()
 
-    def record(self, name,duration = 15 , storage = "local"):
+    def record(self, name,duration = 15):
         """ Records a video with a specified duration and saves it to the specified storage.
         
         :param duration: Video duration in seconds. Default is 15 seconds.
-        :param storage: target storage. Default is local.
         :returns: A video with the specified duration. 
         :rtype: format specified
         """
@@ -62,8 +59,11 @@ class video:
         """
         self.camera.resolution = res
 
-    def motion_detect(self, images = False, videos = False):
+    def motion_detect(self, images = False, videos = False, dbx = None):
         """ Detects motion in a video stream.
+        :param images: whether or not to detect motion and save images
+        :param vidoes: whether or not to log motion vidoes
+        :param dbx: whether or not to save images or vidoes onto dropbox
         :returns: a flag to indicate the presence of motion within a video stream.
         :rtype: Boolean
         """
@@ -125,25 +125,30 @@ class video:
                         img_count += 1
                         cv2.imwrite(self.local + "motion" + str(img_count) + ".jpg", gray_frame)
 
+                        if dbx:
+                            dbx.upload_image(name = "motion" + str(img_count) + ".jpg",
+                                            local = self.local + "motion" + str(img_count) + ".jpg")
+
                         motion_count = 0
                         lastCheck = timestamp
                 if (videos):
                     motion_frames.append(frame)
 
             else:
-                if self.frames_to_video(motion_frames, name = "video" + str(video_count+1) ):
+                if self.frames_to_video(motion_frames, name = "video" + str(video_count+1), dbx = dbx):
                     video_count +=1
                     motion_frames = []
                 motion_count = 0
             
             raw.truncate(0)
     
-    def frames_to_video(self,frames = [], name = "video", video_type = "avi"):
+    def frames_to_video(self,frames = [], name = "video", video_type = "avi", dbx = None):
         """Convert a series of frames/images to a single video.
 
         :param frames: a list containing the frames to be converted.
         :param name: The name of the video to be saved.
         :param video_type: the video file extension.
+        :param dbx: to save to dropbox
         
         """
 
@@ -159,5 +164,9 @@ class video:
             video.write(frames[i])
 
         video.release()
+
+        if dbx:
+            dbx.upload_video(name = name + "." + video_type,
+                            local = self.local + name + "." + video_type)
 
         return True
